@@ -38,6 +38,12 @@ source("R/cache.R")
 source("R/validation.R")
 source("R/app_context.R")
 source("R/universe_builder.R")
+source("R/indicators.R")
+source("R/indicators_engine.R")
+source("R/features.R")
+source("R/setups.R")
+source("R/scoring.R")
+source("R/scanner.R")
 
 #========================================================
 # Dashboard

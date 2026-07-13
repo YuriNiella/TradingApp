@@ -77,14 +77,81 @@ config <- list(
   #======================================================
 
   indicators = list(
+      
+      ema_short  = 20,
+      
+      ema_long   = 50,
+      
+      high_period = 20,
+      
+      rvol_period = 20,
+      
+      atr_period  = 14,
+      
+      return_period = 5
+    
+    ),
 
-    ema_short = 20,
+  #======================================================
+  # Features
+  #======================================================
 
-    ema_long = 50,
+  features = list(
 
-    high_period = 20,
+      near_high_pct = 0.02,
 
-    rvol_period = 20
+      volume_surge = 1.5,
+
+      pullback_pct = 0.03,
+
+      trend_emerging = -0.005
+
+  ),
+
+  #======================================================
+  # Scoring
+  #======================================================
+
+  scoring = list(
+
+      breakout = list(
+
+          trend_up = 30,
+          near_high = 15,
+          breakout = 20,
+          volume = 25,
+          pullback = 10
+
+      ),
+
+      emerging_breakout = list(
+
+          trend_emerging = 30,
+          near_high = 15,
+          breakout = 20,
+          volume = 25,
+          pullback = 10
+
+      ),
+
+      pullback = list(
+
+          trend_up = 40,
+          pullback = 30,
+          not_breakout = 20,
+          normal_volume = 10
+
+      )
+
+  ),
+  
+  #======================================================
+  # Strategy
+  #======================================================
+  
+  scanner = list(
+
+      batch_size = 100
 
   ),
 
@@ -94,9 +161,21 @@ config <- list(
 
   strategy = list(
 
-    breakout_lookback = 20,
+      breakout = list(
 
-    hold_days = 5
+          require_volume = TRUE,
+          require_pullback = FALSE,
+          allow_emerging = FALSE
+
+      ),
+
+      emerging_breakout = list(
+
+          require_volume = TRUE,
+          require_pullback = TRUE,
+          allow_emerging = TRUE
+
+      )
 
   ),
 

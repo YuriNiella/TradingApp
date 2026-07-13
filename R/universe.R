@@ -316,20 +316,6 @@ market_summary <- function(
 }
 
 #--------------------------------------------------------
-# Load Prices
-#--------------------------------------------------------
-load_prices <- function(
-    con,
-    tickers,
-    from = NULL,
-    to = NULL
-){
-
-    stop("Not implemented.")
-
-}
-
-#--------------------------------------------------------
 # Latest Prices
 #--------------------------------------------------------
 get_latest_prices <- function(

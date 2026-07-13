@@ -22,11 +22,21 @@ validate_application <- function(ctx){
 # Validate database
 #--------------------------------------------------------
 
-validate_database <- function(ctx){
+validate_database <- function(con){
 
-    health <- database_health(ctx$con)
+    health <- database_health(con)
 
-    failed <- names(Filter(isFALSE, health))
+    failed <- names(
+
+        Filter(
+
+            isFALSE,
+
+            health
+
+        )
+
+    )
 
     if(length(failed) > 0){
 
@@ -36,7 +46,13 @@ validate_database <- function(ctx){
 
                 "Database validation failed:",
 
-                paste(failed, collapse = ", ")
+                paste(
+
+                    failed,
+
+                    collapse = ", "
+
+                )
 
             ),
 

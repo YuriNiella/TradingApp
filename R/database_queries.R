@@ -108,3 +108,51 @@ get_latest_ticker_dates <- function(con){
     latest
 
 }
+
+#--------------------------------------------------------
+# Load price history
+#--------------------------------------------------------
+load_prices <- function(
+    con,
+    ticker,
+    from = NULL,
+    to = NULL
+){
+
+    sql <- "
+
+        SELECT
+
+            date,
+            open,
+            high,
+            low,
+            close,
+            adj_close,
+            volume
+
+        FROM prices_daily
+
+        WHERE ticker = ?
+
+        ORDER BY date
+
+    "
+
+    prices <- DBI::dbGetQuery(
+
+        con,
+
+        sql,
+
+        params = list(ticker)
+
+    )
+
+    prices$date <- as.Date(
+        prices$date
+    )
+
+    prices
+
+}
