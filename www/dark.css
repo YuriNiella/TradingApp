@@ -1,0 +1,25 @@
+body{
+
+    background:#111111;
+
+    color:white;
+
+    font-family:Segoe UI;
+
+}
+
+.value-box{
+
+    border-radius:12px;
+
+    padding:18px;
+
+    margin-bottom:18px;
+
+}
+
+.btn{
+
+    border-radius:10px;
+
+}
