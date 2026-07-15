@@ -2,6 +2,130 @@
 # Scoring Engine
 #========================================================
 
+#========================================================
+# Continuous scores 
+#========================================================
+score_trend_quality <- function(prices){
+
+    score <- pmin(
+
+        prices$trend_strength / 0.05,
+
+        1
+
+    )
+
+    sanitize_quality(score)
+
+}
+
+score_emerging_quality <- function(prices){
+
+    score <- ifelse(
+
+        prices$trend_emerging,
+
+        1,
+
+        0
+
+    )
+
+    sanitize_quality(score)
+
+}
+
+score_volume_quality <- function(prices){
+
+    score <- pmin(
+
+        prices$rvol_20 / 2,
+
+        1
+
+    )
+
+    sanitize_quality(score)
+
+}
+
+score_near_high_quality <- function(prices){
+
+    distance <-
+
+        (prices$high_20 - prices$close) /
+
+        prices$high_20
+
+    score <- pmax(
+
+        1 -
+
+        distance /
+
+        config$features$near_high_pct,
+
+        0
+
+    )
+
+    sanitize_quality(score)
+
+}
+
+score_pullback_quality <- function(prices){
+
+    distance <-
+
+        abs(
+
+            prices$distance_ema_20
+
+        )
+
+    score <-
+
+        1 -
+
+        abs(
+
+            distance - 0.02
+
+        ) / 0.05
+
+    score <- pmax(
+
+        pmin(score,1),
+
+        0
+
+    )
+
+    sanitize_quality(score)
+
+}
+
+score_breakout_quality <- function(prices){
+
+    score <- numeric(nrow(prices))
+
+    score[prices$breakout_20] <- 1
+
+    sanitize_quality(score)
+
+}
+
+sanitize_quality <- function(score){
+
+    score[!is.finite(score)] <- 0
+
+    pmin(
+        pmax(score, 0),
+        1
+    )
+
+}
+
 #--------------------------------------------------------
 # Calculate all scores
 #--------------------------------------------------------
@@ -12,12 +136,15 @@ calculate_scores <- function(
     validate_prices(prices)
 
     prices$score_breakout <-
+
         score_breakout(prices)
 
     prices$score_emerging_breakout <-
+
         score_emerging_breakout(prices)
 
     prices$score_pullback <-
+
         score_pullback(prices)
 
     prices
@@ -27,146 +154,38 @@ calculate_scores <- function(
 #--------------------------------------------------------
 # Breakout Score
 #--------------------------------------------------------
-score_breakout <- function(
-    prices
-){
+score_breakout <- function(prices){
 
-    score <- numeric(nrow(prices))
+    round(
 
-    score <- score +
+        30 * score_trend_quality(prices) +
 
-        ifelse(
+        25 * score_volume_quality(prices) +
 
-            prices$trend_up,
+        25 * score_breakout_quality(prices) +
 
-            config$scoring$breakout$trend_up,
+        20 * score_near_high_quality(prices)
 
-            0
-
-        )
-
-    score <- score +
-
-        ifelse(
-
-            prices$near_high,
-
-            config$scoring$breakout$near_high,
-
-            0
-
-        )
-
-    score <- score +
-
-        ifelse(
-
-            prices$breakout_20,
-
-            config$scoring$breakout$breakout,
-
-            0
-
-        )
-
-    score <- score +
-
-        ifelse(
-
-            prices$volume_surge,
-
-            config$scoring$breakout$volume,
-
-            0
-
-        )
-
-    score <- score +
-
-        ifelse(
-
-            prices$pullback,
-
-            config$scoring$breakout$pullback,
-
-            0
-
-        )
-
-    pmin(score, 100)
+    )
 
 }
 
 #--------------------------------------------------------
 # Emerging Breakout Score
 #--------------------------------------------------------
-score_emerging_breakout <- function(
-    prices
-){
+score_emerging_breakout <- function(prices){
 
-    score <- numeric(nrow(prices))
+    round(
 
-    score <- score +
+        25 * as.numeric(prices$trend_emerging) +
 
-        ifelse(
+        25 * score_near_high_quality(prices) +
 
-            prices$trend_emerging,
+        25 * score_breakout_quality(prices) +
 
-            config$scoring$emerging_breakout$trend_emerging,
+        25 * score_volume_quality(prices)
 
-            0
-
-        )
-
-    score <- score +
-
-        ifelse(
-
-            prices$near_high,
-
-            config$scoring$emerging_breakout$near_high,
-
-            0
-
-        )
-
-    score <- score +
-
-        ifelse(
-
-            prices$breakout_20,
-
-            config$scoring$emerging_breakout$breakout,
-
-            0
-
-        )
-
-    score <- score +
-
-        ifelse(
-
-            prices$volume_surge,
-
-            config$scoring$emerging_breakout$volume,
-
-            0
-
-        )
-
-    score <- score +
-
-        ifelse(
-
-            prices$pullback,
-
-            config$scoring$emerging_breakout$pullback,
-
-            0
-
-        )
-
-    pmin(score, 100)
+    )
 
 }
 
@@ -175,40 +194,16 @@ score_emerging_breakout <- function(
 #--------------------------------------------------------
 score_pullback <- function(prices){
 
-    score <- numeric(nrow(prices))
+    round(
 
-    score <- score +
+        35 * score_trend_quality(prices) +
 
-        ifelse(
-            prices$trend_up,
-            40,
-            0
-        )
+        35 * score_pullback_quality(prices) +
 
-    score <- score +
+        20 * score_near_high_quality(prices) +
 
-        ifelse(
-            prices$pullback,
-            30,
-            0
-        )
+        10 * (1 - score_volume_quality(prices))
 
-    score <- score +
-
-        ifelse(
-            prices$near_high,
-            20,
-            0
-        )
-
-    score <- score +
-
-        ifelse(
-            !prices$breakout_20,
-            10,
-            0
-        )
-
-    score
+    )
 
 }

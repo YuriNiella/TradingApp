@@ -3,6 +3,26 @@
 #========================================================
 
 #--------------------------------------------------------
+# Check sufficient history
+#--------------------------------------------------------
+check_history <- function(
+    prices,
+    period
+){
+
+    validate_prices(prices)
+
+    if(nrow(prices) < period){
+
+        return(FALSE)
+
+    }
+
+    TRUE
+
+}
+
+#--------------------------------------------------------
 # Exponential Moving Average
 #--------------------------------------------------------
 calculate_ema <- function(
@@ -12,13 +32,17 @@ calculate_ema <- function(
 
     validate_prices(prices)
 
-    if(period < 1){
+    if(!check_history(prices, period)){
 
-        stop(
+        return(
 
-            "Period must be greater than zero.",
+            rep(
 
-            call. = FALSE
+                NA_real_,
+
+                nrow(prices)
+
+            )
 
         )
 
@@ -42,9 +66,23 @@ calculate_high <- function(
     period
 ){
 
-    validate_prices(
-        prices
-    )
+    validate_prices(prices)
+
+    if(!check_history(prices, period)){
+
+        return(
+
+            rep(
+
+                NA_real_,
+
+                nrow(prices)
+
+            )
+
+        )
+
+    }
 
     zoo::rollapply(
 
@@ -74,9 +112,27 @@ calculate_rvol <- function(
 
     validate_prices(prices)
 
+    if(!check_history(prices, period)){
+
+        return(
+
+            rep(
+
+                NA_real_,
+
+                nrow(prices)
+
+            )
+
+        )
+
+    }
+
+    volume <- as.numeric(prices$volume)
+
     avg_volume <- zoo::rollapply(
 
-        prices$volume,
+        volume,
 
         width = period,
 
@@ -90,8 +146,11 @@ calculate_rvol <- function(
 
     )
 
-    prices$volume / avg_volume
+    rvol <- volume / avg_volume
 
+    rvol[!is.finite(rvol)] <- 0
+
+    rvol
 }
 
 #--------------------------------------------------------
@@ -104,9 +163,29 @@ calculate_atr <- function(
 
     validate_prices(prices)
 
+    if(!check_history(prices, period)){
+
+        return(
+
+            rep(
+
+                NA_real_,
+
+                nrow(prices)
+
+            )
+
+        )
+
+    }
+
     atr <- TTR::ATR(
 
-        prices[, c("high", "low", "close")],
+        prices[, c(
+            "high",
+            "low",
+            "close"
+        )],
 
         n = period
 
@@ -135,6 +214,24 @@ calculate_return_pct <- function(
     prices,
     period
 ){
+
+    validate_prices(prices)
+
+    if(nrow(prices) <= period){
+
+        return(
+
+            rep(
+
+                NA_real_,
+
+                nrow(prices)
+
+            )
+
+        )
+
+    }
 
     prices$close /
 

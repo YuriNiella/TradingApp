@@ -169,12 +169,11 @@ scan_batch <- function(
 
         function(ticker){
 
+            cat("Scanning", ticker, "\n")
+
             scan_ticker(
-
                 con,
-
                 ticker
-
             )
 
         }
@@ -333,17 +332,11 @@ summarise_ticker <- function(
 
         )
 
-    setup_count <-
+    setups[is.na(setups)] <- FALSE
 
-        sum(
+    setup_count <- sum(setups)
 
-            setups,
-
-            na.rm = TRUE
-
-        )
-
-    if(any(setups)){
+    if(any(setups, na.rm = TRUE)){
 
         triggered_setup <-
 
@@ -381,7 +374,7 @@ summarise_ticker <- function(
 
     reasons <- character()
 
-    if(row$trend_emerging){
+    if(isTRUE(row$trend_emerging)) {
 
         reasons <- c(
             reasons,
@@ -390,9 +383,9 @@ summarise_ticker <- function(
 
     }
 
-    if(row$breakout_20){
+    if(isTRUE(row$breakout_20)){
 
-        if(row$volume_surge){
+        if(isTRUE(row$volume_surge)){
 
             reasons <- c(
                 reasons,
@@ -410,7 +403,7 @@ summarise_ticker <- function(
 
     }
 
-    if(row$pullback){
+    if(isTRUE(row$pullback)){
 
         reasons <- c(
             reasons,

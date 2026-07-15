@@ -2,6 +2,14 @@
 # Trading Setups
 #========================================================
 
+sanitize_setup <- function(setup){
+
+    setup[is.na(setup)] <- FALSE
+
+    setup
+
+}
+
 #--------------------------------------------------------
 # Calculate all setups
 #--------------------------------------------------------
@@ -31,7 +39,7 @@ setup_breakout <- function(
     prices
 ){
 
-    prices$trend_up &
+    setup <- prices$trend_up &
 
         prices$near_high &
 
@@ -45,6 +53,8 @@ setup_breakout <- function(
 
         )
 
+    sanitize_setup(setup)
+
 }
 
 #--------------------------------------------------------
@@ -54,7 +64,7 @@ setup_emerging_breakout <- function(
     prices
 ){
 
-    prices$trend_emerging &
+    setup <- prices$trend_emerging &
 
         prices$near_high &
 
@@ -76,6 +86,8 @@ setup_emerging_breakout <- function(
 
         )
 
+    sanitize_setup(setup)
+
 }
 
 #--------------------------------------------------------
@@ -85,10 +97,14 @@ setup_pullback <- function(
     prices
 ){
 
-    prices$trend_up &
+    setup <- prices$trend_up &
 
         prices$pullback &
 
+        prices$near_high &
+
         !prices$breakout_20
+
+    sanitize_setup(setup)
 
 }

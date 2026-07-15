@@ -20,34 +20,11 @@ con <- database_connect(
     config$paths$database
 )
 
-result <- scan_ticker(
-    con,
-    "CBA"
-)
+prices <- load_prices(con, "CBA")
 
-result$success
 
-result$data$summary
+system.time({
 
-result$data$analysis
+    result <- scan_market(con)
 
-result <- scan_market(
-
-    con,
-
-    tickers = c(
-
-        "CBA",
-        "BHP",
-        "CSL",
-        "MQG",
-        "XRO"
-
-    )
-
-)
-
-scan_ticker(
-     con,
-     "BHP"
- )$data$analysis
+})

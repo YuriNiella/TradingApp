@@ -114,32 +114,13 @@ config <- list(
 
   scoring = list(
 
-      breakout = list(
+      quality = list(
 
-          trend_up = 30,
-          near_high = 15,
+          trend = 30,
+          volume = 20,
           breakout = 20,
-          volume = 25,
-          pullback = 10
-
-      ),
-
-      emerging_breakout = list(
-
-          trend_emerging = 30,
-          near_high = 15,
-          breakout = 20,
-          volume = 25,
-          pullback = 10
-
-      ),
-
-      pullback = list(
-
-          trend_up = 40,
-          pullback = 30,
-          not_breakout = 20,
-          normal_volume = 10
+          pullback = 20,
+          near_high = 10
 
       )
 
