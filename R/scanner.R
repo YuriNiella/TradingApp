@@ -216,9 +216,20 @@ scan_batch <- function(
 # Scan ticker
 #--------------------------------------------------------
 scan_ticker <- function(
-    con,
+    con = NULL,
     ticker
 ){
+
+    if(is.null(con)){
+
+        con <- connect_database()
+
+        on.exit(
+            DBI::dbDisconnect(con),
+            add = TRUE
+        )
+
+    }
 
     prices <- load_prices(
         con,
@@ -267,6 +278,20 @@ scan_ticker <- function(
             analysis
         )
 
+    #----------------------------------------------------
+    # Trading Lab object
+    #----------------------------------------------------
+
+    idea <-
+
+        create_idea_object(
+
+            summary,
+
+            analysis
+
+        )
+
     make_result(
 
         success = TRUE,
@@ -279,7 +304,9 @@ scan_ticker <- function(
 
             summary = summary,
 
-            analysis = analysis
+            analysis = analysis,
+
+            idea = idea
 
         )
 
@@ -491,6 +518,36 @@ summarise_scan <- function(
             1
 
         )
+
+    )
+
+}
+
+#========================================================
+# Idea Object
+#========================================================
+
+create_idea_object <- function(
+
+    summary,
+
+    analysis,
+
+    source = "Scanner"
+
+){
+
+    list(
+
+        ticker = summary$ticker,
+
+        created = Sys.time(),
+
+        source = source,
+
+        summary = summary,
+
+        analysis = analysis
 
     )
 

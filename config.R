@@ -28,6 +28,8 @@ config <- list(
 
       database = "data/asx_scanner.sqlite",
 
+      trading_lab = "data/asx_trading_lab.sqlite",
+
       universe = "data/universe.csv",
 
       raw = "raw",
@@ -37,6 +39,7 @@ config <- list(
       logs = "logs"
 
   ),
+
 
   #======================================================
   # Market

@@ -46,8 +46,12 @@ source("R/scoring.R")
 source("R/scanner.R")
 
 #========================================================
+# Trading Lab
+#========================================================
+source("R/trading_lab/database.R")
+source("R/trading_lab/ideas.R")
+
+
+#========================================================
 # Dashboard
 #========================================================
-
-source("modules/dashboard/ui.R")
-source("modules/dashboard/server.R")
