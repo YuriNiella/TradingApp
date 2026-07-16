@@ -54,3 +54,10 @@ snapshot <- latest_snapshot(
 snapshot$snapshot_json
 
 idea <- decode_snapshot(snapshot)
+
+get_active_ideas(con_lab)
+
+
+#### Test risk.R
+
+

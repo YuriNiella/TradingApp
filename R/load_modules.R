@@ -54,6 +54,7 @@ source("R/trading_lab/history.R")
 source("R/trading_lab/workflow.R")
 source("R/trading_lab/snapshots.R")
 source("R/trading_lab/constants.R")
+source("R/trading_lab/risk.R")
 
 
 #========================================================
