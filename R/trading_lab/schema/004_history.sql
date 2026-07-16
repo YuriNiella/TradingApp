@@ -1,7 +1,3 @@
---======================================================
--- Idea History
---======================================================
-
 CREATE TABLE IF NOT EXISTS idea_history (
 
     history_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -16,7 +12,13 @@ CREATE TABLE IF NOT EXISTS idea_history (
 
     score REAL,
 
-    triggered INTEGER,
+    confidence TEXT,
+
+    setup_count INTEGER,
+
+    triggered_setup TEXT,
+
+    status TEXT,
 
     reason TEXT,
 

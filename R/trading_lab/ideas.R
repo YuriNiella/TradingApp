@@ -5,7 +5,7 @@
 #--------------------------------------------------------
 # Insert idea
 #--------------------------------------------------------
-insert_idea <- function(
+create_idea <- function(
     con,
     idea
 ){
@@ -38,13 +38,13 @@ insert_idea <- function(
 
             status,
 
-            initial_setup,
+            current_setup,
 
-            initial_score,
+            current_score,
 
-            initial_reason,
+            current_reason,
 
-            initial_price,
+            current_price,
 
             notes
 
@@ -68,7 +68,7 @@ insert_idea <- function(
 
             idea$source,
 
-            "Watching",
+            idea$status,
 
             idea$summary$closest_setup,
 
@@ -440,5 +440,113 @@ count_ideas <- function(
         )
 
     )$n[[1]]
+
+}
+
+#========================================================
+# Idea Object
+#========================================================
+
+create_idea_object <- function(
+    summary,
+    analysis,
+    source = "Scanner"
+){
+
+    stopifnot(
+
+        nrow(summary) == 1,
+
+        nrow(analysis) == 1
+
+    )
+
+    list(
+
+        ticker = summary$ticker,
+
+        created_datetime = Sys.time(),
+
+        market_date = summary$date,
+
+        source = source,
+
+        status = "Watching",
+
+        summary = summary,
+
+        analysis = analysis
+
+    )
+
+}
+
+#--------------------------------------------------------
+# Refresh idea record
+#--------------------------------------------------------
+refresh_idea_record <- function(
+    con,
+    idea_id,
+    idea
+){
+
+    stopifnot(
+
+        idea_exists(
+            con,
+            idea_id
+        )
+
+    )
+
+    now <- as.character(Sys.time())
+
+    DBI::dbExecute(
+
+        con,
+
+        "
+
+        UPDATE ideas
+
+        SET
+
+            updated_datetime = ?,
+
+            status = ?,
+
+            current_setup = ?,
+
+            current_score = ?,
+
+            current_reason = ?,
+
+            current_price = ?
+
+        WHERE idea_id = ?
+
+        ",
+
+        params = list(
+
+            now,
+
+            idea$status,
+
+            idea$summary$closest_setup,
+
+            idea$summary$setup_score,
+
+            idea$summary$reason,
+
+            idea$summary$close,
+
+            idea_id
+
+        )
+
+    )
+
+    invisible(TRUE)
 
 }

@@ -16,13 +16,13 @@ CREATE TABLE IF NOT EXISTS ideas (
 
     status TEXT NOT NULL,
 
-    initial_setup TEXT,
+    current_setup TEXT,
 
-    initial_score REAL,
+    current_score REAL,
 
-    initial_reason TEXT,
+    current_reason TEXT,
 
-    initial_price REAL,
+    current_price REAL,
 
     notes TEXT
 

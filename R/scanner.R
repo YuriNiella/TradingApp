@@ -522,33 +522,3 @@ summarise_scan <- function(
     )
 
 }
-
-#========================================================
-# Idea Object
-#========================================================
-
-create_idea_object <- function(
-
-    summary,
-
-    analysis,
-
-    source = "Scanner"
-
-){
-
-    list(
-
-        ticker = summary$ticker,
-
-        created = Sys.time(),
-
-        source = source,
-
-        summary = summary,
-
-        analysis = analysis
-
-    )
-
-}

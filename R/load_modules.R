@@ -50,6 +50,8 @@ source("R/scanner.R")
 #========================================================
 source("R/trading_lab/database.R")
 source("R/trading_lab/ideas.R")
+source("R/trading_lab/history.R")
+source("R/trading_lab/workflow.R")
 
 
 #========================================================
