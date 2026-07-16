@@ -550,3 +550,81 @@ refresh_idea_record <- function(
     invisible(TRUE)
 
 }
+
+#--------------------------------------------------------
+# Get active ideas
+#--------------------------------------------------------
+get_active_ideas <- function(
+    con,
+    statuses = IDEA_STATUS$active
+){
+
+    stopifnot(
+
+        length(statuses) > 0
+
+    )
+
+    placeholders <-
+
+        paste(
+
+            rep("?", length(statuses)),
+
+            collapse = ", "
+
+        )
+
+    query <- paste0(
+
+        "
+
+        SELECT *
+
+        FROM ideas
+
+        WHERE status IN (",
+
+        placeholders,
+
+        ")
+
+        ORDER BY
+
+            current_score DESC,
+
+            updated_datetime DESC
+
+        "
+
+    )
+
+    DBI::dbGetQuery(
+
+        con,
+
+        query,
+
+        params = as.list(statuses)
+
+    )
+
+}
+
+#--------------------------------------------------------
+# Get inactive ideas
+#--------------------------------------------------------
+get_inactive_ideas <- function(
+    con,
+    statuses = IDEA_STATUS$inactive
+){
+
+    get_active_ideas(
+
+        con,
+
+        statuses = statuses
+
+    )
+
+}

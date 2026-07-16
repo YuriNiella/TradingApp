@@ -29,40 +29,28 @@ result <- scan_ticker(
     "BHP"
 )
 
-idea <- result$data$idea
-
 idea_id <- capture_idea(
     con_lab,
-    idea
+    result$data$idea
 )
 
-get_idea(
+count_ideas(con_lab)
+
+count_idea_history(
     con_lab,
     idea_id
 )
 
-get_idea_history(
+count_snapshots(
     con_lab,
     idea_id
 )
 
-idea$status <- "Ready"
-idea$summary$setup_score <- 82
-idea$summary$confidence <- "★★★★"
-idea$summary$reason <- "Breakout confirmed"
-
-refresh_idea(
-    con_lab,
-    idea_id,
-    idea
-)
-
-get_idea(
+snapshot <- latest_snapshot(
     con_lab,
     idea_id
 )
 
-get_idea_history(
-    con_lab,
-    idea_id
-)
+snapshot$snapshot_json
+
+idea <- decode_snapshot(snapshot)

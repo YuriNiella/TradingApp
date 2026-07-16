@@ -10,18 +10,6 @@ capture_idea <- function(
     idea
 ){
 
-    stopifnot(
-
-        is.list(idea),
-
-        !is.null(idea$ticker),
-
-        !is.null(idea$summary),
-
-        !is.null(idea$analysis)
-
-    )
-
     DBI::dbBegin(con)
 
     success <- FALSE
@@ -39,36 +27,21 @@ capture_idea <- function(
     idea_id <-
 
         create_idea(
-
             con,
-
             idea
-
         )
 
     add_idea_history(
-
         con,
-
         idea_id,
-
         idea
-
     )
 
-    if(exists("add_snapshot")){
-
-        add_snapshot(
-
-            con,
-
-            idea_id,
-
-            idea
-
-        )
-
-    }
+    add_snapshot(
+        con,
+        idea_id,
+        idea
+    )
 
     DBI::dbCommit(con)
 
@@ -82,12 +55,12 @@ capture_idea <- function(
 # Refresh idea
 #--------------------------------------------------------
 refresh_idea <- function(
-    con_lab,
+    con,
     idea_id,
     idea
 ){
 
-    DBI::dbBegin(con_lab)
+    DBI::dbBegin(con)
 
     success <- FALSE
 
@@ -95,47 +68,31 @@ refresh_idea <- function(
 
         if(!success){
 
-            DBI::dbRollback(con_lab)
+            DBI::dbRollback(con)
 
         }
 
     }, add = TRUE)
 
     refresh_idea_record(
-
-        con_lab,
-
+        con,
         idea_id,
-
         idea
-
     )
 
     add_idea_history(
-
-        con_lab,
-
+        con,
         idea_id,
-
         idea
-
     )
 
-    if(exists("add_snapshot")){
+    add_snapshot(
+        con,
+        idea_id,
+        idea
+    )
 
-        add_snapshot(
-
-            con_lab,
-
-            idea_id,
-
-            idea
-
-        )
-
-    }
-
-    DBI::dbCommit(con_lab)
+    DBI::dbCommit(con)
 
     success <- TRUE
 
