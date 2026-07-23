@@ -151,7 +151,7 @@ trading_lab_server <- function(id, con_lab){
   #----------------------------------------------------
 
   scan_results <- reactiveVal(NULL)
-
+  scan_summary <- reactiveVal(NULL)
 
   observeEvent(input$btn_run_scanner, {
 
@@ -183,9 +183,8 @@ trading_lab_server <- function(id, con_lab){
 
     )
 
-    scan_results(
-        result$data$scan
-    )
+    scan_results(result$data$scan)
+    scan_summary(result$data$summary)
 
     scan_summary <- result$data$summary
 
@@ -233,32 +232,94 @@ trading_lab_server <- function(id, con_lab){
 
   })
 
-  output$todays_setups <- DT::renderDT({
+  output$todays_setups <- renderDT({
 
-    req(scan_results())
+      req(scan_results())
 
-    ui_table(
+      ui_table(
 
-        scan_results() |>
-            dplyr::filter(!is.na(triggered_setup)) |>
-            dplyr::arrange(desc(setup_score)) |>
-            dplyr::select(
-                ticker,
-                closest_setup,
-                setup_score,
-                confidence,
-                reason
-            ),
+          scan_results(),
 
-        selection = "single",
+          selection = "single",
 
-        options = list(
-            pageLength = 15
-        )
+          options = list(
 
-    )
+              pageLength = 15
 
-})  
+          )
+
+      )
+
+  }) 
+
+  output$scanner_summary <- renderText({
+
+      req(scan_summary())
+
+      sprintf(
+          "Scanned: %d • Setups: %d",
+          scan_summary()$scanned,
+          scan_summary()$triggered
+      )
+
+  })
+
+    selected_setup <- reactive({
+
+      req(input$todays_setups_rows_selected)
+
+      scan_results() |>
+
+          slice(
+
+              input$todays_setups_rows_selected
+
+          )
+
+  })
+
+  # Action buttons
+  observeEvent(
+
+    input$btn_create_idea,
+
+    {
+
+        req(selected_setup())
+
+        print(selected_setup())
+
+    }
+
+)
+
+  observeEvent(
+
+    input$btn_add_watchlist,
+
+    {
+
+        req(selected_setup())
+
+        print("Watchlist")
+
+    }
+
+)
+
+  observeEvent(
+
+    input$btn_view_chart,
+
+    {
+
+        req(selected_setup())
+
+        print(selected_setup()$ticker)
+
+    }
+
+)
 
     #----------------------------------------------------
     # Dashboard

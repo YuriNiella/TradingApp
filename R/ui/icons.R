@@ -34,6 +34,8 @@ ui_icons <- list(
   # Trading
   #------------------------------------------------------
 
+  watchlist = bsicons::bs_icon("bookmark-star"),
+
   planned = fa("clipboard-check"),
 
   watching = fa("binoculars"),

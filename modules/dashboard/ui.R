@@ -185,13 +185,47 @@ trading_lab_ui <- function(id){
 
         card(
 
-            full_screen = TRUE,
+          full_screen = TRUE,
 
-            card_header("Today's Opportunities"),
+          card_header("Today's Opportunities"),
 
-            DT::DTOutput(ns("todays_setups"))
+          layout_columns(
 
-        ),
+              col_widths = c(3,3,3,3),
+
+              actionButton(
+                  ns("btn_create_idea"),
+                  "Create Idea",
+                  icon = ui_icon("ideas"),
+                  class = "btn-primary"
+              ),
+
+              actionButton(
+                  ns("btn_add_watchlist"),
+                  "Add Watchlist",
+                  icon = ui_icon("watchlist"),
+                  class = "btn-secondary"
+              ),
+
+              actionButton(
+                  ns("btn_view_chart"),
+                  "View Chart",
+                  icon = ui_icon("chart"),
+                  class = "btn-info"
+              ),
+
+              div(
+                  style="text-align:right;padding-top:8px;",
+                  textOutput(ns("scanner_summary"))
+              )
+
+          ),
+
+          br(),
+
+          DTOutput(ns("todays_setups"))
+
+      ),
 
         br(),
 
