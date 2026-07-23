@@ -7,10 +7,11 @@
 #--------------------------------------------------------
 scan_market <- function(
     con,
-    tickers = get_universe_tickers(con),
+    tickers = build_scan_universe(con),
     min_score = 0,
     triggered_only = FALSE,
-    setups = NULL
+    setups = NULL,
+    progress_callback = NULL
 ){
 
     validate_database(con)
@@ -28,6 +29,15 @@ scan_market <- function(
     )
 
     for(i in seq_along(batches)){
+
+        if(!is.null(progress_callback)){
+            progress_callback(
+                current = i,
+                total = length(batches),
+                batch = i
+            )
+
+        }
 
         cat(
             "Scanning batch",
@@ -171,24 +181,26 @@ scan_batch <- function(
 
             cat("Scanning", ticker, "\n")
 
-            scan_ticker(
-                con,
-                ticker
-            )
+            result <- tryCatch({
+
+                scan_ticker(
+                    con,
+                    ticker
+                )
+
+            }, error = function(e){
+
+                message("Failed: ", ticker, " - ", conditionMessage(e))
+
+                NULL
+
+            })
 
         }
 
     )
 
-    results <- Filter(
-
-        function(x)
-
-            !is.null(x) && x$success,
-
-        results
-
-    )
+    results <- Filter(Negate(is.null), results)
 
     if(length(results) == 0){
 

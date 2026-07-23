@@ -4,7 +4,7 @@
 
 # Setting up testing
 R
-setwd("/Users/yuriniella/Documents/GitHub/YTA/New App")
+setwd("/Users/yuriniella/Documents/GitHub/TradingApp")
 quit()
 n
 

@@ -435,7 +435,13 @@ download_batch <- function(
 
             },
 
-            future.seed = TRUE
+            future.seed = TRUE,
+
+            future.packages = c(
+                "quantmod",
+                "xts",
+                "zoo"
+            )
 
         )
 

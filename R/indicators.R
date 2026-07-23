@@ -5,20 +5,17 @@
 #--------------------------------------------------------
 # Check sufficient history
 #--------------------------------------------------------
-check_history <- function(
-    prices,
-    period
-){
+check_history <- function(prices, period){
 
     validate_prices(prices)
 
-    if(nrow(prices) < period){
+    required <- c("high", "low", "close")
 
-        return(FALSE)
+    complete_rows <- sum(
+        complete.cases(prices[, required])
+    )
 
-    }
-
-    TRUE
+    complete_rows >= (period + 1)
 
 }
 
@@ -156,40 +153,28 @@ calculate_rvol <- function(
 #--------------------------------------------------------
 # Average True Range
 #--------------------------------------------------------
-calculate_atr <- function(
-    prices,
-    period
-){
+calculate_atr <- function(prices, period){
 
     validate_prices(prices)
 
     if(!check_history(prices, period)){
-
-        return(
-
-            rep(
-
-                NA_real_,
-
-                nrow(prices)
-
-            )
-
-        )
-
+        return(rep(NA_real_, nrow(prices)))
     }
 
-    atr <- TTR::ATR(
+    atr <- tryCatch(
 
-        prices[, c(
-            "high",
-            "low",
-            "close"
-        )],
+        TTR::ATR(
+            prices[, c("high", "low", "close")],
+            n = period
+        ),
 
-        n = period
+        error = function(e) NULL
 
     )
+
+    if(is.null(atr)){
+        return(rep(NA_real_, nrow(prices)))
+    }
 
     atr[, "atr"]
 

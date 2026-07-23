@@ -60,4 +60,24 @@ get_active_ideas(con_lab)
 
 #### Test risk.R
 
+plan <- create_trade_plan(
 
+    capital = 20000,
+
+    entry = 58000,
+
+    atr = 1.3
+
+)
+
+plan
+
+calculate_trade_profit(
+
+    shares = 100,
+
+    entry = 10,
+
+    exit = 10
+
+)

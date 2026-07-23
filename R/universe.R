@@ -224,6 +224,46 @@ get_universe_tickers <- function(
 }
 
 #--------------------------------------------------------
+# Apply universe filters
+#--------------------------------------------------------
+build_scan_universe <- function(con){
+
+    sql <- "
+    WITH latest AS (
+        SELECT
+            p.*,
+            ROW_NUMBER() OVER (
+                PARTITION BY ticker
+                ORDER BY date DESC
+            ) AS rn
+        FROM prices_daily p
+    )
+    SELECT
+        u.ticker,
+        l.close,
+        l.volume,
+        l.close * l.volume AS dollar_volume
+    FROM universe u
+    JOIN latest l
+        ON u.ticker = l.ticker
+    WHERE
+        u.active = 1
+        AND l.rn = 1
+    "
+
+    latest <- DBI::dbGetQuery(con, sql)
+
+    latest |>
+        dplyr::filter(
+            close >= config$universe$price_min,
+            close <= config$universe$price_max,
+            volume >= config$universe$min_volume,
+            dollar_volume >= config$universe$min_dollar_volume
+        ) |>
+        dplyr::pull(ticker)
+}
+
+#--------------------------------------------------------
 # Load Market
 #--------------------------------------------------------
 load_market <- function(

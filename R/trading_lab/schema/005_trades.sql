@@ -18,11 +18,11 @@ CREATE TABLE IF NOT EXISTS trades (
 
     scanner_score REAL,
 
-    suggested_entry REAL,
+    scanner_entry REAL,
 
-    suggested_stop REAL,
+    scanner_stop REAL,
 
-    suggested_target REAL,
+    scanner_target REAL,
 
     atr REAL,
 
@@ -38,7 +38,9 @@ CREATE TABLE IF NOT EXISTS trades (
 
     capital REAL,
 
-    shares INTEGER,
+    planned_shares INTEGER,
+
+    actual_shares INTEGER,
 
     actual_entry REAL,
 

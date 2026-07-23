@@ -5,28 +5,24 @@
 #--------------------------------------------------------
 # Download one ticker from Yahoo
 #--------------------------------------------------------
-fetch_yahoo <- function(
-    ticker,
-    from
-){
+fetch_yahoo <- function(ticker, from){
 
     symbol <- paste0(ticker, ".AX")
 
-    message(sprintf(
+    message(sprintf("Downloading %-8s", symbol))
 
-        "Downloading %-8s",
+    x <- tryCatch(
 
-        symbol
+        suppressWarnings(
 
-    ))
+            quantmod::getSymbols(
+                Symbols = symbol,
+                src = "yahoo",
+                from = from,
+                auto.assign = FALSE,
+                warnings = FALSE
+            )
 
-    x <- suppressWarnings(tryCatch(
-
-        quantmod::getSymbols(
-            symbol,
-            src = "yahoo",
-            from = from,
-            auto.assign = FALSE
         ),
 
         error = function(e){
@@ -34,29 +30,21 @@ fetch_yahoo <- function(
             message("Failed: ", ticker)
             message("Reason: ", conditionMessage(e))
 
-            NULL
+            return(NULL)
 
         }
 
-    ))
+    )
 
-    if(anyNA(x)){
-
-        message("Missing values detected for ", ticker)
-
-    }
-
-    if(is.null(x)){
-
+    if(is.null(x))
         return(NULL)
 
-    }
+    # Remove incomplete rows immediately
+    x <- x[stats::complete.cases(x), ]
 
-    x <- na.omit(x)
+    if(NROW(x) == 0){
 
-    if(nrow(x) == 0){
-
-        message("No rows returned for ", ticker)
+        message("No valid rows returned for ", ticker)
 
         return(NULL)
 
@@ -64,25 +52,28 @@ fetch_yahoo <- function(
 
     data.frame(
 
-        ticker=ticker,
+        ticker = ticker,
 
-        date=as.Date(zoo::index(x)),
+        date = as.Date(zoo::index(x)),
 
-        open=as.numeric(quantmod::Op(x)),
+        open = as.numeric(quantmod::Op(x)),
 
-        high=as.numeric(quantmod::Hi(x)),
+        high = as.numeric(quantmod::Hi(x)),
 
-        low=as.numeric(quantmod::Lo(x)),
+        low = as.numeric(quantmod::Lo(x)),
 
-        close=as.numeric(quantmod::Cl(x)),
+        close = as.numeric(quantmod::Cl(x)),
 
-        adj_close=as.numeric(quantmod::Ad(x)),
+        adj_close = as.numeric(quantmod::Ad(x)),
 
-        volume=as.numeric(quantmod::Vo(x))
+        volume = as.numeric(quantmod::Vo(x)),
+
+        stringsAsFactors = FALSE
 
     )
 
 }
+
 
 #--------------------------------------------------------
 # Latest market date (Yahoo)
