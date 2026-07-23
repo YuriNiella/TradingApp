@@ -152,6 +152,7 @@ trading_lab_server <- function(id, con_lab){
 
   scan_results <- reactiveVal(NULL)
   scan_summary <- reactiveVal(NULL)
+  watchlist_refresh <- reactiveVal(0)
 
   observeEvent(input$btn_run_scanner, {
 
@@ -293,19 +294,74 @@ trading_lab_server <- function(id, con_lab){
 
 )
 
-  observeEvent(
+  # Watchlist
 
-    input$btn_add_watchlist,
+  observeEvent(input$btn_add_watchlist, {
 
-    {
+      req(selected_setup())
 
-        req(selected_setup())
+      success <- add_watchlist(
+          con_lab,
+          selected_setup()
+      )
 
-        print("Watchlist")
+      if(success){
 
-    }
+          watchlist_refresh(watchlist_refresh() + 1)
 
-)
+          showNotification(
+              paste(selected_setup()$ticker, "added to Watchlist"),
+              type = "message"
+          )
+
+      } else {
+
+          showNotification(
+              paste(selected_setup()$ticker, "is already in the Watchlist"),
+              type = "warning"
+          )
+
+      }
+
+  })
+
+  output$watchlist_table <- DT::renderDT({
+
+    ui_table(
+
+        watchlist(),
+
+        selection = "single",
+
+        options = list(
+
+            pageLength = 15
+
+        )
+    )
+
+  })
+
+  # Refresh watchlist
+
+  watchlist <- reactive({
+
+    watchlist_refresh()
+
+    get_watchlist(con_lab)
+
+  })
+
+
+
+
+
+
+
+
+
+
+
 
   observeEvent(
 

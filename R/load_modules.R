@@ -56,6 +56,7 @@ source("R/trading_lab/snapshots.R")
 source("R/trading_lab/constants.R")
 source("R/trading_lab/risk.R")
 source("R/trading_lab/trades.R")
+source("R/trading_lab/watchlist.R")
 
 #========================================================
 # Services
