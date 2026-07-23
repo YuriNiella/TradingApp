@@ -73,7 +73,7 @@ add_watchlist <- function(con, setup){
 
             reason = setup$reason,
 
-            added_date = Sys.Date(),
+            added_date = as.character(Sys.Date()),
 
             status = "Active",
 
@@ -88,6 +88,27 @@ add_watchlist <- function(con, setup){
     )
 
     TRUE
+
+}
+
+#========================================================
+# Delete from Watchlist
+#========================================================
+
+delete_watchlist <- function(con, ticker){
+
+    DBI::dbExecute(
+
+        con,
+
+        "
+        DELETE FROM watchlist
+        WHERE ticker = ?
+        ",
+
+        params = list(ticker)
+
+    )
 
 }
 

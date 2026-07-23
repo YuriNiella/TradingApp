@@ -352,11 +352,35 @@ trading_lab_server <- function(id, con_lab){
 
   })
 
+  selected_watchlist <- reactive({
 
+    req(input$watchlist_table_rows_selected)
 
+    watchlist() |>
 
+        dplyr::slice(input$watchlist_table_rows_selected)
 
+  })
 
+  observeEvent(input$btn_delete_watchlist, {
+
+    req(input$watchlist_table_rows_selected)
+
+    row <- watchlist() |>
+        dplyr::slice(input$watchlist_table_rows_selected)
+
+    ticker <- row$ticker[[1]]
+
+    delete_watchlist(con_lab, ticker)
+
+    watchlist_refresh(watchlist_refresh() + 1)
+
+    showNotification(
+        paste(ticker, "removed from Watchlist"),
+        type = "message"
+    )
+
+  })
 
 
 

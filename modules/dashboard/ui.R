@@ -259,6 +259,23 @@ trading_lab_ui <- function(id){
 
               card_header("Watchlist"),
 
+              layout_columns(
+
+                  col_widths = c(3, 9),
+
+                  actionButton(
+                      ns("btn_delete_watchlist"),
+                      "Delete",
+                      icon = ui_icon("delete"),
+                      class = "btn-danger"
+                  ),
+
+                  div()
+
+              ),
+
+              br(),
+
               DTOutput(ns("watchlist_table"))
 
           )
