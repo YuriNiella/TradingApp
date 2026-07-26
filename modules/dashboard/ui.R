@@ -194,13 +194,6 @@ trading_lab_ui <- function(id){
               col_widths = c(3,3,3,3),
 
               actionButton(
-                  ns("btn_create_idea"),
-                  "Create Idea",
-                  icon = ui_icon("ideas"),
-                  class = "btn-primary"
-              ),
-
-              actionButton(
                   ns("btn_add_watchlist"),
                   "Add Watchlist",
                   icon = ui_icon("watchlist"),
@@ -253,32 +246,45 @@ trading_lab_ui <- function(id){
 
           "Watchlist",
 
-          card(
+       card(
 
-              full_screen = TRUE,
+            full_screen = TRUE,
 
-              card_header("Watchlist"),
+            card_header("Watchlist"),
 
-              layout_columns(
+            layout_columns(
 
-                  col_widths = c(3, 9),
+                col_widths = c(6, 6),
 
-                  actionButton(
-                      ns("btn_delete_watchlist"),
-                      "Delete",
-                      icon = ui_icon("delete"),
-                      class = "btn-danger"
-                  ),
+                div(
 
-                  div()
+                    actionButton(
+                        ns("btn_create_idea"),
+                        "Create Idea",
+                        icon = ui_icon("ideas")
+                    ),
 
-              ),
+                    actionButton(
+                        ns("btn_delete_watchlist"),
+                        "Delete",
+                        icon = ui_icon("delete"),
+                        class = "btn-danger"
+                    )
 
-              br(),
+                ),
 
-              DTOutput(ns("watchlist_table"))
+                div(
+                    class = "text-end",
+                    textOutput(ns("watchlist_summary"))
+                )
 
-          )
+            ),
+
+            br(),
+
+            DTOutput(ns("watchlist_table"))
+
+        )
 
       ),
 
@@ -295,6 +301,20 @@ trading_lab_ui <- function(id){
           full_screen = TRUE,
 
           card_header("Ideas"),
+
+          layout_columns(
+
+                col_widths = c(6, 6),
+
+                div(
+                    actionButton(
+                        ns("btn_delete_idea"),
+                        "Delete Idea",
+                        icon = ui_icon("delete"),
+                        class = "btn-danger"
+                    )
+                )
+            ),
 
           DTOutput(ns("ideas_table"))
 

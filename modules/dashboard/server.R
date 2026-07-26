@@ -279,21 +279,6 @@ trading_lab_server <- function(id, con_lab){
 
   })
 
-  # Action buttons
-  observeEvent(
-
-    input$btn_create_idea,
-
-    {
-
-        req(selected_setup())
-
-        print(selected_setup())
-
-    }
-
-)
-
   # Watchlist
 
   observeEvent(input$btn_add_watchlist, {
@@ -383,10 +368,6 @@ trading_lab_server <- function(id, con_lab){
   })
 
 
-
-
-
-
   observeEvent(
 
     input$btn_view_chart,
@@ -430,14 +411,143 @@ trading_lab_server <- function(id, con_lab){
     # Ideas
     #----------------------------------------------------
 
-    output$ideas_table <- renderDT({
+    ideas_refresh <- reactiveVal(0)
 
-        df <- get_ideas(con_lab)
+    ideas <- reactive({
 
-        ui_table(df)
+        ideas_refresh()
+
+        get_active_ideas(con_lab)
 
     })
 
+    observeEvent(input$btn_create_idea, {
+
+      req(input$watchlist_table_rows_selected)
+
+      row <-
+
+          watchlist() |>
+
+          dplyr::slice(
+
+              input$watchlist_table_rows_selected
+
+          )
+
+      ticker <- row$ticker[[1]]
+  
+      req(scan_results())
+ 
+      summary <-
+
+          scan_results() |>
+
+          dplyr::filter(
+
+              ticker == !!ticker
+
+          )
+
+      req(nrow(summary) == 1)
+
+      idea_id <-
+
+          promote_watchlist_to_idea(
+
+              con_lab,
+
+              summary = summary,
+
+              analysis = summary
+
+          )
+
+      watchlist_refresh(
+
+          watchlist_refresh() + 1
+
+      )
+
+      ideas_refresh(
+
+          ideas_refresh() + 1
+
+      )
+
+      showNotification(
+
+          paste(
+
+              ticker,
+
+              "promoted to Idea"
+
+          ),
+
+          type = "message"
+
+      )
+
+    })
+
+    output$ideas_table <- renderDT({
+
+        ui_table(
+            ideas()
+        )
+
+    })
+
+    observeEvent(input$btn_delete_idea, {
+
+      req(input$ideas_table_rows_selected)
+
+      row <- ideas() |>
+          dplyr::slice(input$ideas_table_rows_selected)
+
+      ticker <- row$ticker[[1]]
+
+      showModal(
+          modalDialog(
+              title = "Delete Idea?",
+              paste("Delete the idea permanently for", ticker, "?"),
+              footer = tagList(
+                  modalButton("Cancel"),
+                  actionButton(
+                      session$ns("confirm_delete_idea"),
+                      "Delete",
+                      class = "btn-danger"
+                  )
+              )
+          )
+      )
+
+    })   
+
+    observeEvent(input$confirm_delete_idea, {
+
+      req(input$ideas_table_rows_selected)
+
+      row <- ideas() |>
+          dplyr::slice(input$ideas_table_rows_selected)
+
+      idea_id <- row$idea_id[[1]]
+
+      delete_idea(con_lab, idea_id)
+
+      removeModal()
+
+      ideas_refresh(
+          ideas_refresh() + 1
+      )
+
+      showNotification(
+          "Idea deleted.",
+          type = "message"
+      )
+
+    })
 
     #----------------------------------------------------
     # Journal

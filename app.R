@@ -20,6 +20,7 @@ con_lab <- connect_trading_lab()
 con_scanner <- database_connect(
     config$paths$database
 )
+create_watchlist_table(con_lab)
 
 #========================================================
 # User Interface

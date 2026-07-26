@@ -8,9 +8,9 @@ create_watchlist_table <- function(con){
 
         CREATE TABLE IF NOT EXISTS watchlist (
 
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            watchlist_id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-            ticker TEXT NOT NULL UNIQUE,
+            ticker TEXT NOT NULL,
 
             setup TEXT,
 
@@ -21,8 +21,6 @@ create_watchlist_table <- function(con){
             reason TEXT,
 
             added_date TEXT,
-
-            status TEXT DEFAULT 'Active',
 
             notes TEXT
 
@@ -42,7 +40,6 @@ add_watchlist <- function(con, setup){
         SELECT COUNT(*) AS n
         FROM watchlist
         WHERE ticker = ?
-          AND status = 'Active'
         ",
 
         params = list(setup$ticker)
@@ -74,8 +71,6 @@ add_watchlist <- function(con, setup){
             reason = setup$reason,
 
             added_date = as.character(Sys.Date()),
-
-            status = "Active",
 
             notes = "",
 
@@ -118,9 +113,11 @@ get_watchlist <- function(con){
 
         con,
 
-        "SELECT * FROM watchlist
-         WHERE status = 'Active'
-         ORDER BY score DESC"
+        "
+        SELECT *
+        FROM watchlist
+        ORDER BY score DESC
+        "
 
     )
 

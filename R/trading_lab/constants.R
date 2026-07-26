@@ -23,3 +23,15 @@ IDEA_STATUS <- list(
     )
 
 )
+
+WATCHLIST_STATUS <- list(
+
+    ACTIVE = "Active",
+
+    PROMOTED = "Promoted",
+
+    DELETED = "Deleted",
+
+    EXPIRED = "Expired"
+
+)
