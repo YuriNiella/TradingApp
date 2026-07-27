@@ -59,6 +59,7 @@ source("R/trading_lab/trades.R")
 source("R/trading_lab/watchlist.R")
 source("R/trading_lab/promotion.R")
 source("R/trading_lab/trade_planner.R")
+source("R/trading_lab/idea_modal.R")
 
 #========================================================
 # Services

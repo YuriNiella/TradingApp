@@ -223,7 +223,9 @@ update_idea <- function(
     con,
     idea_id,
     status = NULL,
-    notes = NULL
+    notes = NULL,
+    summary = NULL,
+    trade_plan = NULL
 ){
 
     if(!idea_exists(
@@ -245,35 +247,64 @@ update_idea <- function(
 
     if(!is.null(status)){
 
-        DBI::dbExecute(
+       rows <- tryCatch(
 
-            con,
+            DBI::dbExecute(
 
-            "
+                con,
 
-            UPDATE ideas
+                "
 
-            SET
+                UPDATE ideas
+                SET
 
-                status = ?,
+                    current_setup = ?,
+                    current_score = ?,
+                    current_reason = ?,
+                    planned_entry = ?,
+                    planned_stop = ?,
+                    planned_target = ?,
+                    risk_percent = ?,
+                    planned_position_size = ?,
+                    planned_r_multiple = ?,
+                    planner = ?,
+                    updated_datetime = ?
 
-                updated_datetime = ?
+                WHERE idea_id = ?
 
-            WHERE idea_id = ?
+                ",
 
-            ",
+                params = list(
 
-            params = list(
+                    summary$closest_setup,
+                    summary$setup_score,
+                    summary$reason,
+                    trade_plan$planned_entry,
+                    trade_plan$planned_stop,
+                    trade_plan$planned_target,
+                    trade_plan$risk_percent,
+                    trade_plan$planned_position_size,
+                    trade_plan$planned_r_multiple,
+                    trade_plan$planner,
+                    now,
+                    idea_id
 
-                status,
+                )
 
-                now,
+            ),
 
-                idea_id
+            error = function(e){
 
-            )
+                message("SQL ERROR:")
+                message(e$message)
 
-        )
+                return(NA)
+
+            }
+    )
+
+    message("Rows updated = ", rows)
+
 
     }
 
@@ -300,6 +331,76 @@ update_idea <- function(
             params = list(
 
                 notes,
+
+                now,
+
+                idea_id
+
+            )
+
+        )
+
+    }
+
+    if(!is.null(summary) && !is.null(trade_plan)){
+
+        DBI::dbExecute(
+
+            con,
+
+            "
+
+            UPDATE ideas
+
+            SET
+
+                current_setup = ?,
+
+                current_score = ?,
+
+                current_reason = ?,
+
+                planned_entry = ?,
+
+                planned_stop = ?,
+
+                planned_target = ?,
+
+                risk_percent = ?,
+
+                planned_position_size = ?,
+
+                planned_r_multiple = ?,
+
+                planner = ?,
+
+                updated_datetime = ?
+
+            WHERE idea_id = ?
+
+            ",
+
+            params = list(
+
+                summary$closest_setup,
+
+                summary$setup_score,
+
+                summary$reason,
+
+                trade_plan$planned_entry,
+
+                trade_plan$planned_stop,
+
+                trade_plan$planned_target,
+
+                trade_plan$risk_percent,
+
+                trade_plan$planned_position_size,
+
+                trade_plan$planned_r_multiple,
+
+                trade_plan$planner,
 
                 now,
 

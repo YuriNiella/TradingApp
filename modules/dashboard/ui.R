@@ -308,6 +308,12 @@ trading_lab_ui <- function(id){
 
                 div(
                     actionButton(
+                        ns("btn_view_idea"),
+                        "View",
+                        icon = ui_icon("eye")
+                    ),
+
+                    actionButton(
                         ns("btn_delete_idea"),
                         "Delete Idea",
                         icon = ui_icon("delete"),

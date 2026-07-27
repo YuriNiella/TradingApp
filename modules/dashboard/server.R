@@ -412,6 +412,8 @@ trading_lab_server <- function(id, con_lab){
     #----------------------------------------------------
 
     ideas_refresh <- reactiveVal(0)
+    current_analysis <- reactiveVal(NULL)
+    selected_idea_id <- reactiveVal(NULL)
 
     ideas <- reactive({
 
@@ -488,6 +490,73 @@ trading_lab_server <- function(id, con_lab){
 
     })
 
+   observeEvent(input$btn_view_idea, {
+
+      req(input$ideas_table_rows_selected)
+
+      row <-
+
+          ideas() |>
+
+          dplyr::slice(
+              input$ideas_table_rows_selected
+          )
+
+      original <-
+
+          get_idea(
+              con_lab,
+              row$idea_id
+          ) |>
+
+          dplyr::slice(1)
+
+      result <-
+
+          scan_ticker(
+
+              con_scanner,
+
+              row$ticker
+
+          )
+
+      selected_idea_id(row$idea_id)
+      current_analysis(result)
+
+      current <- list(
+
+          date = Sys.time(),
+
+          setup = result$data$summary$closest_setup,
+
+          score = result$data$summary$setup_score,
+
+          reason = result$data$summary$reason,
+
+          entry = result$data$idea$trade_plan$planned_entry,
+
+          stop = result$data$idea$trade_plan$planned_stop,
+
+          target = result$data$idea$trade_plan$planned_target,
+
+          planner = result$data$idea$trade_plan$planner
+
+      )
+
+      show_idea_modal(
+
+          original = original,
+
+          current = current,
+
+          session = session
+
+      )
+
+  })
+
+
     observeEvent(input$btn_delete_idea, {
 
       req(input$ideas_table_rows_selected)
@@ -537,6 +606,29 @@ trading_lab_server <- function(id, con_lab){
       )
 
     })
+
+    observeEvent(input$btn_update_selected_idea, {
+
+      req(current_analysis())
+      req(selected_idea_id())
+
+      result <- current_analysis()
+
+      update_idea(
+
+          con = con_lab,
+
+          idea_id = selected_idea_id(),
+
+          summary = result$data$summary,
+
+          trade_plan = result$data$idea$trade_plan
+
+      )
+
+  })
+
+ 
 
     #----------------------------------------------------
     # Journal
