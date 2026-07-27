@@ -436,30 +436,19 @@ trading_lab_server <- function(id, con_lab){
           )
 
       ticker <- row$ticker[[1]]
+
+      result <- scan_ticker(
+        con_scanner,
+        ticker
+      )
   
-      req(scan_results())
- 
-      summary <-
-
-          scan_results() |>
-
-          dplyr::filter(
-
-              ticker == !!ticker
-
-          )
-
-      req(nrow(summary) == 1)
-
       idea_id <-
 
           promote_watchlist_to_idea(
 
               con_lab,
 
-              summary = summary,
-
-              analysis = summary
+              idea = result$data$idea
 
           )
 

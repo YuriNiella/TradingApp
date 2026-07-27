@@ -24,6 +24,20 @@ CREATE TABLE IF NOT EXISTS ideas (
 
     current_price REAL,
 
+    planned_entry REAL,
+
+    planned_stop REAL,
+
+    planned_target REAL,
+
+    risk_percent REAL,
+
+    planned_position_size REAL,
+
+    planned_r_multiple REAL,
+
+    planner TEXT,
+
     notes TEXT
 
 );

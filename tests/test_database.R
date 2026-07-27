@@ -17,7 +17,7 @@ source("global.R")
 source("R/load_modules.R")
 
 con <- database_connect(
-    config$database$path
+    config$paths$database
 )
 
 database_initialize(con)

@@ -46,13 +46,27 @@ create_idea <- function(
 
             current_price,
 
+            planned_entry,
+
+            planned_stop,
+
+            planned_target,
+
+            risk_percent,
+
+            planned_position_size,
+
+            planned_r_multiple,
+
+            planner,
+
             notes
 
         )
 
         VALUES (
 
-            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
 
         )
 
@@ -62,9 +76,9 @@ create_idea <- function(
 
             idea$ticker,
 
-            now,
+            now,                     
 
-            now,
+            now,                     
 
             idea$source,
 
@@ -78,7 +92,21 @@ create_idea <- function(
 
             idea$summary$close,
 
-            NA_character_
+            idea$trade_plan$planned_entry,
+
+            idea$trade_plan$planned_stop,
+
+            idea$trade_plan$planned_target,
+
+            idea$trade_plan$risk_percent,
+
+            idea$trade_plan$planned_position_size,
+
+            idea$trade_plan$planned_r_multiple,
+
+            idea$trade_plan$planner,
+
+            NA_character_              # notes
 
         )
 
@@ -461,6 +489,8 @@ create_idea_object <- function(
 
     )
 
+    plan <- build_trade_plan(summary, analysis)
+
     list(
 
         ticker = summary$ticker,
@@ -475,7 +505,9 @@ create_idea_object <- function(
 
         summary = summary,
 
-        analysis = analysis
+        analysis = analysis,
+
+        trade_plan = plan
 
     )
 
