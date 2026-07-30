@@ -272,6 +272,8 @@ scan_ticker <- function(
 
     prices <- calculate_indicators(prices)
 
+    prices <- calculate_market_structure(prices)
+
     prices <- calculate_features(prices)
 
     prices <- calculate_setups(prices)

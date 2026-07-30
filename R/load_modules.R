@@ -43,6 +43,7 @@ source("R/indicators_engine.R")
 source("R/features.R")
 source("R/setups.R")
 source("R/scoring.R")
+source("R/market_structure.R")
 source("R/scanner.R")
 
 #========================================================

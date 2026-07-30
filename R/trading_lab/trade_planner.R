@@ -2,43 +2,52 @@
 # Trade Planner
 #========================================================
 
-build_trade_plan <- function(summary, analysis){
+build_trade_plan <- function(
+    summary,
+    analysis,
+    settings
+){
 
     setup <- summary$closest_setup
 
-    switch(
+    levels <-
 
-        setup,
+        switch(
 
-        Breakout = plan_breakout(summary, analysis),
+            setup,
 
-        "Emerging Breakout" = plan_emerging_breakout(summary, analysis),
+            Breakout = plan_breakout(summary, analysis),
 
-        Pullback = plan_pullback(summary, analysis),
+            "Emerging Breakout" = plan_emerging_breakout(summary, analysis),
 
-        default_trade_plan(summary, analysis)
+            Pullback = plan_pullback(summary, analysis),
+
+            default_trade_plan(summary, analysis)
+
+        )
+
+    calculate_trade_metrics(
+
+        levels = levels,
+
+        settings = settings
 
     )
 
 }
 
 
-#--------------------------------------------------------
-# Default
-#--------------------------------------------------------
+#========================================================
+# TECHNICAL PLANS
+#========================================================
 
 default_trade_plan <- function(summary, analysis){
 
-    close <- summary$close
-    atr <- analysis$atr_14
+    list(
 
-    create_trade_plan(
+        entry = summary$close,
 
-        entry = close,
-
-        stop = close - atr,
-
-        target = close + (2 * atr),
+        stop = summary$close - analysis$atr_14,
 
         planner = "Default"
 
@@ -47,31 +56,26 @@ default_trade_plan <- function(summary, analysis){
 }
 
 
-#--------------------------------------------------------
-# Breakout
-#--------------------------------------------------------
-
 plan_breakout <- function(summary, analysis){
 
     entry <- analysis$high * 1.001
 
-    stop <- max(
+    ## TODO:
+    ## Replace with recent swing low once available
 
+    stop <- min(
+
+        analysis$low,
         analysis$ema_20,
-
-        analysis$close - (2 * analysis$atr_14),
-
         na.rm = TRUE
 
     )
 
-    create_trade_plan(
+    list(
 
         entry = entry,
 
         stop = stop,
-
-        target = entry + (2 * (entry - stop)),
 
         planner = "Breakout"
 
@@ -80,31 +84,23 @@ plan_breakout <- function(summary, analysis){
 }
 
 
-#--------------------------------------------------------
-# Emerging Breakout
-#--------------------------------------------------------
-
 plan_emerging_breakout <- function(summary, analysis){
 
     entry <- analysis$close
 
     stop <- min(
 
+        analysis$low,
         analysis$ema_20,
-
-        analysis$close - analysis$atr_14,
-
         na.rm = TRUE
 
     )
 
-    create_trade_plan(
+    list(
 
         entry = entry,
 
         stop = stop,
-
-        target = entry + (2 * (entry - stop)),
 
         planner = "Emerging Breakout"
 
@@ -113,31 +109,23 @@ plan_emerging_breakout <- function(summary, analysis){
 }
 
 
-#--------------------------------------------------------
-# Pullback
-#--------------------------------------------------------
-
 plan_pullback <- function(summary, analysis){
 
     entry <- analysis$close
 
     stop <- min(
 
+        analysis$low,
         analysis$ema_20,
-
-        analysis$close - analysis$atr_14,
-
         na.rm = TRUE
 
     )
 
-    create_trade_plan(
+    list(
 
         entry = entry,
 
         stop = stop,
-
-        target = entry + (2 * (entry - stop)),
 
         planner = "Pullback"
 
@@ -146,55 +134,166 @@ plan_pullback <- function(summary, analysis){
 }
 
 
-#--------------------------------------------------------
-# Constructor
-#--------------------------------------------------------
+#========================================================
+# RISK ENGINE
+#========================================================
+
+calculate_trade_metrics <- function(
+
+    levels,
+    settings
+
+){
+
+    risk_per_share <-
+
+        levels$entry - levels$stop
+
+    target <-
+
+        levels$entry +
+
+        settings$r_multiple *
+
+        risk_per_share
+
+    max_risk_dollars <-
+
+        settings$account_size *
+
+        settings$risk_percent / 100
+
+    max_position_size <-
+
+        floor(
+
+            max_risk_dollars /
+
+            risk_per_share
+
+        )
+
+    capital_required <-
+
+        max_position_size *
+
+        levels$entry
+
+    feasible <-
+
+        capital_required <= settings$account_size
+
+    gross_profit <-
+
+        max_position_size *
+
+        (target - levels$entry)
+
+    gross_loss <-
+
+        max_position_size *
+
+        (levels$entry - levels$stop)
+
+    net_profit <-
+
+        gross_profit -
+
+        settings$brokerage
+
+    net_loss <-
+
+        gross_loss +
+
+        settings$brokerage
+
+    create_trade_plan(
+
+        entry = levels$entry,
+
+        stop = levels$stop,
+
+        target = target,
+
+        planner = levels$planner,
+
+        risk_percent = settings$risk_percent,
+
+        position_size = max_position_size,
+
+        capital_required = capital_required,
+
+        gross_profit = gross_profit,
+
+        gross_loss = gross_loss,
+
+        net_profit = net_profit,
+
+        net_loss = net_loss,
+
+        brokerage = settings$brokerage,
+
+        feasible = feasible,
+
+        r_multiple = settings$r_multiple
+
+    )
+
+}
+
+
+#========================================================
+# CONSTRUCTOR
+#========================================================
 
 create_trade_plan <- function(
 
     entry,
-
     stop,
-
     target,
-
     planner,
-
-    risk_percent = 1,
-
-    position_size = NA_real_
+    risk_percent,
+    position_size,
+    capital_required,
+    gross_profit,
+    gross_loss,
+    net_profit,
+    net_loss,
+    brokerage,
+    feasible,
+    r_multiple
 
 ){
 
-    risk <- abs(entry - stop)
-
-    reward <- abs(target - entry)
-
-    r_multiple <-
-
-        if(risk > 0)
-
-            reward / risk
-
-        else
-
-            NA_real_
-
     list(
 
-        planned_entry = round(entry, 2),
+        planned_entry = round(entry,2),
 
-        planned_stop = round(stop, 2),
+        planned_stop = round(stop,2),
 
-        planned_target = round(target, 2),
+        planned_target = round(target,2),
 
         risk_percent = risk_percent,
 
         planned_position_size = position_size,
 
-        planned_r_multiple = round(r_multiple, 2),
+        planned_r_multiple = r_multiple,
 
-        planner = planner
+        planner = planner,
+
+        capital_required = round(capital_required,2),
+
+        gross_profit = round(gross_profit,2),
+
+        gross_loss = round(gross_loss,2),
+
+        brokerage = brokerage,
+
+        net_profit = round(net_profit,2),
+
+        net_loss = round(net_loss,2),
+
+        feasible = feasible
 
     )
 
