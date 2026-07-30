@@ -36,10 +36,7 @@ calculate_features <- function(prices){
 
 feature_trend_up <- function(prices){
 
-    ema_short <- prices[[paste0("ema_", config$indicators$ema_short)]]
-    ema_long  <- prices[[paste0("ema_", config$indicators$ema_long)]]
-
-    ema_short > ema_long
+    prices$market_structure == "Uptrend"
 
 }
 
@@ -47,7 +44,7 @@ feature_trend_emerging <- function(prices){
 
     ema_short <- prices[[paste0("ema_", config$indicators$ema_short)]]
 
-    !prices$trend_up &
+    prices$market_structure == "Range" &
 
         prices$close > ema_short &
 
@@ -60,14 +57,13 @@ feature_trend_strength <- function(prices){
     ema_short <- prices[[paste0("ema_", config$indicators$ema_short)]]
     ema_long  <- prices[[paste0("ema_", config$indicators$ema_long)]]
 
-
     pmax(
 
-    (ema_short - ema_long) / ema_long,
+        (ema_short - ema_long) / ema_long,
 
-    0
+        0
 
-)
+    )
 
 }
 

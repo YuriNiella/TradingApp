@@ -590,7 +590,11 @@ create_idea_object <- function(
 
     )
 
-    plan <- build_trade_plan(summary, analysis)
+    plan <- build_trade_plan(
+        summary,
+        analysis,
+        get_trading_settings()
+    )
 
     list(
 

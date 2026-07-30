@@ -65,3 +65,4 @@ geom_text(
   theme_bw()
 
 
+result <- scan_ticker(con, "BHP")

@@ -331,6 +331,7 @@ scan_ticker <- function(
 #--------------------------------------------------------
 # Summarise ticker
 #--------------------------------------------------------
+
 summarise_ticker <- function(
     row
 ){
@@ -377,7 +378,7 @@ summarise_ticker <- function(
 
     setup_count <- sum(setups)
 
-    if(any(setups, na.rm = TRUE)){
+    if(any(setups)){
 
         triggered_setup <-
 
@@ -413,49 +414,70 @@ summarise_ticker <- function(
 
         )
 
-    reasons <- character()
+    #----------------------------------------------------
+    # Reason
+    #----------------------------------------------------
 
-    if(isTRUE(row$trend_emerging)) {
+    if(!is.na(triggered_setup)){
 
-        reasons <- c(
-            reasons,
-            "Emerging trend"
+        reason <- switch(
+
+            triggered_setup,
+
+            Breakout =
+                "Confirmed breakout",
+
+            Emerging_Breakout =
+                "Emerging breakout",
+
+            Pullback =
+                "Healthy pullback"
+
         )
 
-    }
+    } else {
 
-    if(isTRUE(row$breakout_20)){
+        reason <- switch(
 
-        if(isTRUE(row$volume_surge)){
+            closest_setup,
 
-            reasons <- c(
-                reasons,
-                "Confirmed breakout"
-            )
+            Breakout =
 
-        } else {
+                if(isTRUE(row$near_high))
 
-            reasons <- c(
-                reasons,
-                "Breakout without volume confirmation"
-            )
+                    "Near breakout, waiting for confirmation"
 
-        }
+                else
 
-    }
+                    "No active breakout setup",
 
-    if(isTRUE(row$pullback)){
+            Emerging_Breakout =
 
-        reasons <- c(
-            reasons,
-            "Healthy pullback"
+                if(row$market_structure == "Range")
+
+                    "Potential emerging breakout"
+
+                else
+
+                    "No active emerging breakout",
+
+            Pullback =
+
+                if(!isTRUE(row$trend_up))
+
+                    paste(
+
+                        "Pullback candidate, but market structure is",
+
+                        row$market_structure
+
+                    )
+
+                else
+
+                    "No active pullback setup"
+
         )
-
-    }
-
-    if(length(reasons) == 0){
-
-        reasons <- "No active setup"
 
     }
 
@@ -477,13 +499,7 @@ summarise_ticker <- function(
 
         confidence = confidence,
 
-        reason = paste(
-
-            reasons,
-
-            collapse = "; "
-
-        ),
+        reason = reason,
 
         stringsAsFactors = FALSE
 
